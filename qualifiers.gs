@@ -2,21 +2,22 @@
 var OSU_API_KEY = scriptProperties.getProperty('APIv1 key')
 var BASE_API_URL = 'https://osu.ppy.sh/api/'
 
+// (MAP_ID, MOD_MULTIPLIER)
 var MAPPOOL = [
-  "2567738",
-  "2766489",
-  "1590460",
-  "2729964",
-  "2594989",
-  "3330566",
-  "2096800",
-  "2828902",
-  "3158362",
-  "1602030",
-  "2015326",
-  "2885483",
-  "3470472",
-  "2713369"
+  ["2567738", 1],
+  ["2766489", 1],
+  ["1590460", 1],
+  ["2729964", 1.06],
+  ["2594989", 1.10],
+  ["3330566", 1.20],
+  ["2096800", 1.17],
+  ["2828902", 1],
+  ["3158362", 1.06],
+  ["1602030", 1.10],
+  ["2015326", 1.20],
+  ["2885483", 0.5],
+  ["3470472", 1.12],
+  ["2713369", 0.3]
 ]
 
 var STAFF = [
@@ -42,7 +43,7 @@ function showResults() {
   for (var playerID in results) {
     var scores = Array(MAPPOOL.length).fill(0)
     for (var beatmapID in results[playerID]) {
-      scores[MAPPOOL.indexOf(beatmapID)] = Number(results[playerID][beatmapID])
+      scores[MAPPOOL.map(x => x[0]).indexOf(beatmapID)] = Number(results[playerID][beatmapID])
     }
     parsed.push([playerID].concat(scores))
   }
@@ -52,7 +53,7 @@ function showResults() {
 
 function processQueue() {
   var multiplayerLinks = SpreadsheetApp.getActiveSpreadsheet().getRange("Qualifiers private!B1:1").getValues()[0]
-  
+
   var results = {}
 
   for (var link of multiplayerLinks) {
@@ -61,7 +62,7 @@ function processQueue() {
       var url = BASE_API_URL + '/get_match?k=' + OSU_API_KEY + '&mp=' + multiplayerID
       var data = JSON.parse(UrlFetchApp.fetch(url).getContentText())["games"]
       for (var map of data) {
-        if (MAPPOOL.includes(map["beatmap_id"]) === false) {
+        if (MAPPOOL.map(x => x[0]).includes(map["beatmap_id"]) === false) {
           continue
         }
         var scores = map["scores"]
@@ -72,14 +73,13 @@ function processQueue() {
           if (score["user_id"] in results === false) {
             results[score["user_id"]] = {} // key: beatmapID, val: score
           }
-          results[score["user_id"]][map["beatmap_id"]] = score["score"]
-
+          var mappoolIndex = MAPPOOL.map(x => x[0]).indexOf(map["beatmap_id"])
+          results[score["user_id"]][map["beatmap_id"]] = score["score"] / MAPPOOL[mappoolIndex][1]
         }
       }
     } catch (TypeError) {
       break
     }
   }
-  
   PropertiesService.getDocumentProperties().setProperty('results', JSON.stringify(results))
 }
