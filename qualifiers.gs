@@ -19,6 +19,18 @@ var MAPPOOL = [
   "2713369"
 ]
 
+var STAFF = [
+  "8631719",  // Defectum
+  "8226974",  // Husa
+  "7428460",  // Razito
+  "8818089",  // Vendelicious
+  "18916920", // Mist31
+  "13806692", // ThatG0y
+  "16204122", // TonyWorep
+  "8414284",  // Markus
+  "16102492"  // PapaGunch
+]
+
 function initResults() {
   PropertiesService.getDocumentProperties().setProperty('results', JSON.stringify({}))
 }
@@ -30,7 +42,7 @@ function showResults() {
   for (var playerID in results) {
     var scores = Array(MAPPOOL.length).fill(0)
     for (var beatmapID in results[playerID]) {
-      scores[MAPPOOL.indexOf(beatmapID)] = results[playerID][beatmapID]
+      scores[MAPPOOL.indexOf(beatmapID)] = Number(results[playerID][beatmapID])
     }
     parsed.push([playerID].concat(scores))
   }
@@ -54,6 +66,9 @@ function processQueue() {
         }
         var scores = map["scores"]
         for (var score of scores) {
+          if (STAFF.includes(score["user_id"])) {
+            continue
+          }
           if (score["user_id"] in results === false) {
             results[score["user_id"]] = {} // key: beatmapID, val: score
           }
