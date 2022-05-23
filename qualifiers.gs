@@ -54,7 +54,7 @@ function showResults() {
 function processQueue() {
   var multiplayerLinks = SpreadsheetApp.getActiveSpreadsheet().getRange("Qualifiers private!B1:1").getValues()[0]
 
-  var results = {}
+  var results = JSON.parse(PropertiesService.getDocumentProperties().getProperty('results'))
 
   for (var link of multiplayerLinks) {
     try {
