@@ -1,0 +1,23 @@
+Group A
+Seed 3
+Seed 7
+Seed 9
+Seed 14
+
+Group B
+Seed 2
+Seed 8
+Seed 10
+Seed 15
+
+Group C
+Seed 1
+Seed 6
+Seed 12
+Seed 16
+
+Group D
+Seed 4
+Seed 5
+Seed 11
+Seed 13
